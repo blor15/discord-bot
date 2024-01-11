@@ -1,7 +1,11 @@
 import { config } from "dotenv";
-import { Client, GatewayIntentBits } from "discord.js";
+import { Client, GatewayIntentBits, Routes } from "discord.js";
+import { REST } from "@discordjs/rest";
 
 config();
+const TOKEN = process.env.BOT_TOKEN;
+const CLIENT_ID = process.env.CLIENT_ID;
+const GUILD_ID = process.env.GUILD_ID;
 
 const client = new Client({
   intents: [
@@ -10,17 +14,32 @@ const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-const TOKEN = process.env.BOT_TOKEN;
 
-client.login(TOKEN);
+const rest = new REST({ version: "10" }).setToken(TOKEN);
 
 // on function let's us listen to an event
 client.on("ready", () => {
   console.log(`${client.user.username} has logged in!`);
 });
 
-client.on("messageCreate", (message) => {
-  console.log(message.content);
-  console.log(message.createdAt.toDateString());
-  console.log(message.author.tag);
-});
+async function main() {
+  const commands = [
+    {
+      name: "ping",
+      description: "Replies with Pong!",
+    },
+  ];
+
+  try {
+    console.log("Started refreshing application (/) commands.");
+    await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), {
+      body: commands,
+    });
+
+    client.login(TOKEN);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+main();
