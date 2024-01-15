@@ -22,11 +22,28 @@ client.on("ready", () => {
   console.log(`${client.user.username} has logged in!`);
 });
 
+client.on("interactionCreate", (interaction) => {
+  if (interaction.isChatInputCommand()) {
+    console.log("Hello");
+    interaction.reply({
+      content: `You ordered ${interaction.options.get("food").value}`,
+    });
+  }
+});
+
 async function main() {
   const commands = [
     {
-      name: "ping",
-      description: "Replies with Pong!",
+      name: "order",
+      description: "Order something...",
+      options: [
+        {
+          name: "food",
+          description: "the type of food",
+          type: 3,
+          required: true,
+        },
+      ],
     },
   ];
 
